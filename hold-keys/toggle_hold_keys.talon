@@ -1,0 +1,10 @@
+-
+hold <user.letter>: user.key_hold(letter)
+hold <user.symbol_key>: user.toggle_hold_key(symbol_key)
+hold <user.function_key>: user.toggle_hold_key(function_key)
+hold <user.special_key>: user.toggle_hold_key(special_key)
+hold <user.keypad_key>: user.toggle_hold_key(keypad_key)
+hold <user.modifiers>: user.toggle_hold_key(modifiers)
+hold <user.arrow_key>: user.key_hold(arrow_key)
+release <user.arrow_key>: user.key_release(arrow_key)
+release all held: user.release_held_keys()
