@@ -18,8 +18,6 @@ panel breakpoints: key(ctrl-alt-b)
 
 # Settings
 show settings: key(alt-t o)
-#show shortcuts:
-#show snippets:
 
 # Display
 fullscreen switch: key(shift-alt-enter)
@@ -27,10 +25,9 @@ wrap switch: key(ctrl-e ctrl-w)
 
 # File Commands
 file hunt [<user.text>]:
-    key(ctrl-shift-t)
-    insert(text or "")
+	key(ctrl-shift-t)
+	insert(text or "")
 file create: key(ctrl-n)
-#file open folder:
 file rename: key(ctrl-[ s f2)
 file reveal: key(ctrl-[ s)
 
@@ -43,9 +40,6 @@ format that: key(ctrl-k ctrl-d)
 format selection: key(ctrl-k ctrl-f)
 imports fix: key(ctrl-r ctrl-g)
 
-# problem next:
-# problem last:
-# problem fix:
 refactor field: key(ctrl-r ctrl-e)
 refactor interface: key(ctrl-r ctrl-i)
 refactor method: key(ctrl-r ctrl-m)
@@ -54,22 +48,22 @@ refactor remove parameters: key(ctrl-r ctrl-v)
 refactor that: key(ctrl-r ctrl-r)
 
 #code navigation
-(go declaration | follow): key(ctrl-f12)  
+(go declaration | follow): key(ctrl-f12)
 go back: key(ctrl--)
 go forward: key(ctrl-shift--)
 go implementation: key(f12)
 go recent [<user.text>]:
-    key(ctrl-1 ctrl-r)
-    sleep(100ms)
-    insert(text or "")
+	key(ctrl-1 ctrl-r)
+	sleep(100ms)
+	insert(text or "")
 go type [<user.text>]:
-    key(ctrl-1 ctrl-t)
-    sleep(100ms)
-    insert(text or "")
+	key(ctrl-1 ctrl-t)
+	sleep(100ms)
+	insert(text or "")
 go member [<user.text>]:
-    key(alt-\)
-    sleep(100ms)
-    insert(text or "")
+	key(alt-\)
+	sleep(100ms)
+	insert(text or "")
 go usage: key(shift-f12)
 
 # Bookmarks.
@@ -121,11 +115,11 @@ toggle terminal: key(ctrl-cmd-t)
 new terminal: key(ctrl-shift-`)
 focus panel: key(ctrl-cmd-j)
 split right: key(cmd-\)
-close all saved: 
+close all saved:
 	key(cmd-k)
 	sleep(200ms)
 	key(u)
-close all: 
+close all:
 	key(cmd-k)
 	sleep(200ms)
 	key(w)
