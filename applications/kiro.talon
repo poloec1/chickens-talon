@@ -93,7 +93,7 @@ debug stopper: key(shift-f5)
 debug continue: key(f5)
 
 # project
-open project: 
+open project:
 	key(cmd-o)
 	sleep(450ms)
 	#go to documents
@@ -101,10 +101,9 @@ open project:
 	sleep(200ms)
 	insert("repo")
 	sleep(200ms)
-	key(©right)
+	key(cmd-right)
 
 # NAVIGATION
-toggle commit: key(ctrl-shift-g)
 toggle search: key(shift-cmd-f)
 
 # Navigating Explorer aka how you move around the files
@@ -115,7 +114,6 @@ toggle right sidebar: key(alt-cmd-b)
 toggle left sidebar: key(cmd-b)
 
 toggle chat: key(ctrl-cmd-i)
-toggle right sidebar: key(alt-cmd-b)
 toggle scope: key(ctrl-shift-cmd-c)
 toggle output: key(shift-cmd-u)
 toggle panel: key(cmd-j)
@@ -148,6 +146,7 @@ ghost ask: key(cmd-l)
 ghost goodbye: key(cmd-w)
 ghost trust: key(shift-cmd-enter)
 ghost run: key(cmd-enter)
+#ghost log in: fixed-position login button, no shortcut/menu — hardcoded coords accepted per house style
 ghost log in:
 	mouse_move(956.42578125, 639.59375)
 	sleep(150ms)
