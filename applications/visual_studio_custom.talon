@@ -54,7 +54,7 @@ refactor remove parameters: key(ctrl-r ctrl-v)
 refactor that: key(ctrl-r ctrl-r)
 
 #code navigation
-(go declaration | follow): key(ctrl-f12)
+(go declaration | follow): key(ctrl-f12)  
 go back: key(ctrl--)
 go forward: key(ctrl-shift--)
 go implementation: key(f12)
@@ -92,6 +92,55 @@ debug start: key(f5)
 debug stopper: key(shift-f5)
 debug continue: key(f5)
 
+# project
+open project: 
+	key(cmd-o)
+	sleep(450ms)
+	#go to documents
+	key(shift-cmd-o)
+	sleep(200ms)
+	insert("repo")
+	sleep(200ms)
+	key(right)
 
-# Terminal
-toggle terminal: key(^-`)
+# NAVIGATION
+toggle commit: key(ctrl-shift-g)
+toggle search: key(shift-cmd-f)
+
+# Navigating Explorer aka how you move around the files
+toggle project: key(shift-cmd-e)
+collapse folders: key(ctrl-cmd-c)
+toggle right sidebar: key(alt-cmd-b)
+toggle left sidebar: key(cmd-b)
+toggle chat: key(ctrl-cmd-i)
+toggle scope: key(ctrl-shift-cmd-c)
+toggle output: key(shift-cmd-u)
+toggle panel: key(cmd-j)
+toggle terminal: key(ctrl-cmd-t)
+new terminal: key(ctrl-shift-`)
+focus panel: key(ctrl-cmd-j)
+split right: key(cmd-\)
+close all saved: 
+	key(cmd-k)
+	sleep(200ms)
+	key(u)
+close all: 
+	key(cmd-k)
+	sleep(200ms)
+	key(w)
+
+# drunk einstein help aka autocomplete/copilot
+quick fix: key(cmd-.)
+inline chat: key(cmd-i)
+new chat: key(cmd-n)
+
+# find and replace
+replace it: key(alt-cmd-f)
+
+#CURSORLESS
+hints toggle: key(ctrl-alt-cmd-t)
+
+# CLAUDE
+focus agent: key(cmd-escape)
+new agent: key(cmd-n)
+resume agent: insert('/resume')
