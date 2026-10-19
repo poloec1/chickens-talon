@@ -8,6 +8,7 @@ mod = Module()
 class Actions:
     def open_folder(path: str):
         """Open a folder in Finder (macOS)"""
+        path = os.path.expanduser(os.path.expandvars(path))
         print(f"[DEBUG] open_folder called with path: {path}")
         if os.path.isdir(path):
             print(f"[DEBUG] Folder exists: {path}")
