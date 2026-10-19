@@ -1,4 +1,4 @@
-aaaaaaaaaapp: chrome
+app: chrome
 -
 tag(): browser
 tag(): user.tabs
