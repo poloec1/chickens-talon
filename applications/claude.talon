@@ -61,6 +61,6 @@ review PR:
 	key(shift-enter)
 	key(cmd-v)
 # DICTATE (Claude's own dictation; Talon sleeps so it does not react to speech)
-dictate:
+hey listen:
 	speech.disable()
 	key(cmd-d)
