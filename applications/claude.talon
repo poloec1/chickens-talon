@@ -5,6 +5,9 @@ app: claude
 # CHAT & FILES
 new (chat | conversation): key(cmd-n)
 open file: key(cmd-o)
+(change directory | change repo | open folder): key(cmd-shift-o)
+focus chat [input]: user.claude_focus_chat_input()
+focus chat debug: user.claude_focus_chat_input_debug()
 
 # APP
 settings: key(cmd-,)
@@ -26,12 +29,20 @@ full screen: key(fn-f)
 minimize: key(cmd-m)
 close window: key(cmd-w)
 
+# GO (no shortcut — via menu)
+go home: user.menu_select('Go|Home')
+go code: user.menu_select('Go|Code')
+next session: key(cmd-shift-])
+previous session: key(cmd-shift-[)
+search sessions: key(cmd-shift-k)
+command palette: key(cmd-k)
+
 # PERMISSION PROMPT (tool-trust dialog)
 # Stable across both prompt variants: Deny is always 1; Allow once is always cmd-enter.
 # "Always allow" has no stable key (it's 2 on the 3-option prompt but absent on the
 # 2-option one, where 2 means Allow once), so pick it manually when you want it.
-deny: key(1)
-(allow once | allow): key(cmd-enter)
+deny it: key(1)
+(allow once | allow it): key(cmd-enter)
 
 # WRITING TOOLS (no shortcut — via menu)
 proofread: user.menu_select('Edit|Writing Tools|Proofread')
@@ -43,3 +54,13 @@ read aloud: user.claude_read_latest()
 stop aloud: user.claude_stop_aloud()
 read aloud debug: user.claude_read_debug()
 read aloud probe: user.claude_read_probe()
+
+# REVIEW PR
+review PR:
+	insert('make sure you are connected to the bitbucket mcp. review this pull request following my global pull request standards:')
+	key(shift-enter)
+	key(cmd-v)
+# DICTATE (Claude's own dictation; Talon sleeps so it does not react to speech)
+dictate:
+	speech.disable()
+	key(cmd-d)

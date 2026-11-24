@@ -28,6 +28,9 @@ LABEL_PATTERNS = ("read aloud", "read this", "read message", "listen aloud")
 # without needing a mouse hover.
 REVEAL_PATTERNS = ("show message actions",)
 
+# Chromium/Electron roles a contenteditable chat composer typically maps to.
+INPUT_ROLE_PATTERNS = ("textarea", "combobox", "textfield")
+
 MAX_NODES = 12000
 
 
@@ -90,7 +93,14 @@ def _pressable(el):
     # Role-agnostic: the read-aloud control is an AXCheckBox, not a button, so
     # match on whether the element actually supports AXPress rather than on role.
     try:
-        return "AXPress" in (el.actions or [])
+        if "AXPress" in (el.actions or []):
+            return True
+    except Exception:
+        pass
+    # Newer Claude builds no longer list AXPress in the actions of these
+    # controls, but they still respond to it. Fall back to the role.
+    try:
+        return str(el.get("AXRole", "") or "") in ("AXButton", "AXCheckBox")
     except Exception:
         return False
 
@@ -109,12 +119,35 @@ def _root():
         return None, None
 
 
+def _collect_text_inputs(root):
+    # Document order, like _collect: the last match is whichever composer is
+    # actually on screen (there's normally just one, but a modal could add more).
+    out = []
+    for el in _walk(root):
+        try:
+            role = str(el.get("AXRole", "") or "").lower()
+        except Exception:
+            continue
+        if not any(p in role for p in INPUT_ROLE_PATTERNS):
+            continue
+        try:
+            if "AXFocused" in (el.attrs or ()):
+                out.append(el)
+        except Exception:
+            pass
+    return out
+
+
 def _collect(root, patterns):
     """All pressable elements whose label matches, in document order."""
     out = []
     for el in _walk(root):
         _role, label = _describe(el)
-        if any(p in label for p in patterns) and _pressable(el):
+        # Match the control's own name (it is repeated as "<name> <name> button",
+        # or "<name> for <message>"), not any text that merely mentions it, such
+        # as session titles or suggestion buttons.
+        if any(label.startswith(p + " " + p) or label.startswith(p + " for ")
+               for p in patterns) and _pressable(el):
             out.append(el)
     return out
 
@@ -132,8 +165,15 @@ def _press(el) -> bool:
     except Exception:
         pass
     try:
+        try:
+            print(f"  target rect={el.rect} actions={list(el.actions or [])}")
+        except Exception as e:
+            print("  target rect/actions unavailable:", e)
         el.perform("AXPress")
         print(f"  pressed AXValue-was={_axvalue(el)!r}")
+        # The app ignores AXPress on this control, so the press alone does
+        # nothing. It is scrolled into view; finish with the eye tracker.
+        app.notify("Claude", "Look at the read aloud button and say click")
         return True
     except Exception as e:
         print("claude read-aloud: AXPress failed:", e)
@@ -175,6 +215,32 @@ class Actions:
         app.notify("Claude", "No read-aloud toggle found (see log)")
         print("claude read-aloud: no match — run 'read aloud debug' to inspect")
 
+    def claude_read_last_message():
+        """Read Claude's latest message aloud, ignoring any stale hover state.
+
+        A message's action row, once revealed by hovering, stays in the AX
+        tree after the mouse moves away. If an older message was hovered
+        earlier, its still-revealed toggle beats a fresh one in the fast path
+        used by claude_read_latest, so that command re-reads the old message
+        instead of the new one. This command skips the fast path and always
+        re-reveals the truly latest message's row first, so it can't be
+        hijacked by a stale hover on an older message.
+        """
+        a, root = _root()
+        if not root:
+            return
+        print("=== claude read last message ===")
+        if not _press_latest_matching(root, REVEAL_PATTERNS):
+            app.notify("Claude", "No message action row found (see log)")
+            print("claude read last message: no reveal control — run 'read aloud debug' to inspect")
+            return
+        actions.sleep("400ms")
+        _, root = _root()
+        if root and _press_latest_matching(root, LABEL_PATTERNS):
+            return
+        app.notify("Claude", "No read-aloud toggle found after reveal (see log)")
+        print("claude read last message: no match after reveal — run 'read aloud debug' to inspect")
+
     def claude_stop_aloud():
         """Toggle off read-aloud on the most recent response (same toggle control)."""
         actions.user.claude_read_latest()
@@ -206,6 +272,56 @@ class Actions:
             )
         print(f"=== {n} read-aloud matches ===")
         app.notify("Claude", f"{n} read-aloud matches probed (see log)")
+
+    def claude_focus_chat_input():
+        """Focus the session chat's text input box, hands-free.
+
+        No menu item or shortcut exists for this, so we drive it through AX:
+        find the composer's text-entry element (role AXTextArea/AXComboBox)
+        and set its AXFocused attribute to True.
+        """
+        a, root = _root()
+        if not root:
+            return
+        print("=== claude focus chat input ===")
+        candidates = _collect_text_inputs(root)
+        print(f"  candidates: {len(candidates)}")
+        if not candidates:
+            app.notify("Claude", "No chat input found (see log)")
+            print("claude focus chat input: no match — run 'focus chat debug' to inspect")
+            return
+        el = candidates[-1]
+        try:
+            el.AXFocused = True
+            print("  focused")
+        except Exception as e:
+            print("claude focus chat input: AXFocused set failed:", e)
+            app.notify("Claude", "Could not focus chat input (see log)")
+
+    def claude_focus_chat_input_debug():
+        """Log every text-input-like element in the Claude AX tree (role, label, focused)."""
+        a, root = _root()
+        if not root:
+            return
+        print("=== claude focus chat input debug ===")
+        n = 0
+        for el in _walk(root):
+            try:
+                d = el.dump()
+            except Exception:
+                continue
+            role = str(d.get("AXRole", "") or "")
+            if not any(p in role.lower() for p in INPUT_ROLE_PATTERNS):
+                continue
+            n += 1
+            print(
+                f"[{role}] AXValue={d.get('AXValue')!r} "
+                f"AXPlaceholderValue={d.get('AXPlaceholderValue')!r} "
+                f"AXDescription={d.get('AXDescription')!r} "
+                f"AXFocused={d.get('AXFocused')!r}"
+            )
+        print(f"=== {n} text-input-like elements ===")
+        app.notify("Claude", f"{n} text inputs probed (see log)")
 
     def claude_read_debug():
         """Log every button label in the Claude AX tree, to confirm the real one.
